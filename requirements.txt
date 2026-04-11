@@ -1,0 +1,6 @@
+Polars
+PyTorch
+Faker
+XlsxWriter
+PyArrow
+Streamlit
