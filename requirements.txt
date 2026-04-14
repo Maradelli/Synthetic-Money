@@ -3,4 +3,4 @@ PyTorch
 Faker
 XlsxWriter
 PyArrow
-Streamlit
+FastAPI
