@@ -8,6 +8,17 @@ import pyarrow.parquet as pq
 import io 
 import polars as pl
 import streamlit as st
+import uuid
+import numpy as np
+
+def message(message: str, level: str = 'INFO'): #logging function
+    logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    if level == 'INFO':
+        logging.info(message)
+    elif level == 'WARNING':
+        logging.warning(message)
+    elif level == 'ERROR':
+        logging.error(message)
 
 def save_to_xlsx(data : pl.DataFrame, str : str = 'XLSX') -> str:
     workbook = xlsxwriter.Workbook('data.xlsx')
@@ -31,3 +42,9 @@ def save_to_parquet(data : pl.DataFrame, str : str = 'PARQUET') -> str:
     pq.write_table(table, 'results.parquet')
     return 'Data was saved in \'parquet\' format!'
 
+
+def generate_uuid() -> str: #for generating unique ids for clients
+    return str(uuid.uuid4())
+
+def log_normal_distribution(mu: float, sigma: float, size: int) -> np.ndarray: #log-normal distribution
+    return np.random.lognormal(mean=mu, sigma=sigma, size=size)

@@ -20,7 +20,7 @@ To group this data, I manually calculated ratio of each segment like that:
 2. **Transport** (4-5%). This segment can be described as the group with high frequency and small sums. These are taxi, travel cards, etc. 
 3. **Auto** (8-10%). This category can be described as the group with low frequency and high sums. Plus we should mention that there can be rare situations like an expensive repair so we'll have to count it later.     
 4. **Housing and communal services** ($\approx$9.8%). This group has low frequency of expenses (once per month) and fixed sums.
-5. **Communications** (3-4%).
+5. **Communications** (3-4%). These are Wi-Fi, mobile internet, etc.
 6. **Healthcare** (5-7%). This segment can be defined by unregular expenses and volatile cheque.
 7. **Clothing and shoes** (8-10%). This category has seasonal spikes. Also there are high volatility, for example, one T-shirt can cost 500 rubles and the other one with famous logo can cost up to 150 000 rubles.
 8. **Restaurants & cafe** (5-7%). This group has significant correlation with weekends and holidays.
@@ -110,9 +110,9 @@ Also I would like to mention that some numbers will be chosen only by logical se
 
     $E$ = **7196** rubles, $max$ = **8504** rubles, $min$ = **6738** rubles:
 
-    $\sigma_{cl} = \frac{ln(max) - ln(min)}{6} = \frac{ln(8504) - ln(6738)}{6} \approx$ **0.039** rubles.
+    $\sigma_{cl} = \frac{ln(max) - ln(min)}{6} = \frac{ln(8504) - ln(6738)}{6} \approx$ **0.039**
 
-    $\mu_{cl} = ln(E) - \frac{\sigma_{cl}^2}{2} \approx 8.8813 - 0.0007 =$ **8.881** rubles.
+    $\mu_{cl} = ln(E) - \frac{\sigma_{cl}^2}{2} \approx 8.8813 - 0.0007 =$ **8.881**
 
     $Median_{cl} = e^{8.881} \approx$ **7193.98** rubles $\to$ calculations are __correct__.
 8. **Restaraunts & cafe**. There is a lot of information about this category so we'll use information from this [website](https://www.banki.ru/news/lenta/?id=11021070):
