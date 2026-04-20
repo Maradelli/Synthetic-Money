@@ -142,6 +142,8 @@ Also I would like to mention that some numbers will be chosen only by logical se
     $\mu_O = ln(E) - \frac{\sigma_O^2}{2} \approx 7.313 - 0.499 =$ **6.814**
 
     $Median_O = e^{6.814} \approx$ **910.51** rubles $\to$ calculations are __correct__.
+    
+    High variance in __'Other'__ is designed to simulate rare large purchases (e.g. gadgets, home appliances) within a stream of small household expenses.
 ### 2.2. Seasonality & Intensity
 
 Now we should discuss about seasonality and intensity because it's pretty obvious that we cannot make transactions every 5 seconds. So in this sectiong we'll find daily routine, weekly routine and monthly routine for each category mentioned earlier. 
@@ -154,24 +156,88 @@ Let's define some variables:
 
 - $\alpha$ - coefficient of transaction's amount
 
-#### 2.2.1 Daily routine & behaviour of each psychotype
+The coefficient $\alpha$ actually 'shifts' the bell of the distribution to the right or left along the sum axis, and $\Phi$ changes the density of events on the timeline.
+#### 2.2.1 Psychotypes & their behaviour
 1. **The Goblin Treasurer**. This type of people cannot live without a thought about saving their own money at any cost. They're conservative and prefer to not borrow at all. They tries to minimize every unecessary expenses. So we've got the next picture of them:
 
     - $E$ gets closer to the $minimum$ for each category.
     - $Frequency$ will be $minimal$.
     - '**Other**' category will be almost equal to 0. However transactions in '**Restaraunts & cafe**' and '**Entertainment**' would happen at least once per month because of a 'special day', for example, birthday.
 
-2. **The Party King**. These guys doesn't even think about their future. Their slogan is **to live today** so it's all says about their relationships with their money if they still have got one.
+2. **The Party King**. These guys doesn't even think about their future. Their slogan is **to live today** so it's all says about their relationships with their money if they still have got one. This type can be described by these facts:
+    - $E$ in '$Dining$' and '$Entertainment$' grows by __+40%__
+    - A lot of small transactions in '$Food$' and '$Other$' categories
+    - A spike of transactions in the first __3 days__ after payment then goes __'silence'__
 
-3. **The Son of a mom's friend**. This is a perfect client's psychotype because they've got everything under their control: they don't spend any more or less that they need, their balance is always positive, they don't spend money impulsivly, etc. This type of people is really rare but their behaviour is the most predictable through all client's types.
+3. **The Son of a mom's friend**. This is a perfect client's psychotype because they've got everything under their control: they don't spend any more or less that they need, their balance is always positive, they don't spend money impulsivly, etc. This type of people is really rare but their behaviour is the most predictable through all client's types:
+    - Doesn't spend a lot of money on '$Other$' category
+    - Investing in its own __health__ (attending doctors just for checkups)
+    - Other transactions won't be changed by weights at all
 
-4. **The Unstoppable Player**. We cannot certainly tell how much this type will spend tomorrow: 500 rubles or 500 000 rubles? 
+4. **The Unstoppable Player**. We cannot certainly tell how much this type will spend tomorrow: 500 rubles or 500 000 rubles? There we'll see a huge __standard deviation__ in every category mentioned earlier:
+    - Huge transactions in __'$Entertainment$'__ and __'$Other$'__ categories
+    - There also will be chaotic transactions' behaviour in __'$Food$'__
+    - Spends more money on __'$Restaurants$ & $cafe$'__ to celebrate its own successes
 
-5. **The hypochondriac Survivalist**.
+5. **The hypochondriac Survivalist**. These clients cares about safety of their money more than anything. They've got a permanent fear of staying without money, getting sick, losing their property, etc. Let's just describe them by next facts:
+    - A lot of big transactions in __'$Health$'__
+    - Always pays subscribes, utility bills, etc. __in time__
+    - They barely go out because of the stress so their expenses in __'$Entertainment$'__ are low
 
-### 2.3. Correlation between Amount and Categories
+So for we should update our formulas to include features of each category. In the code we'll use these formulas:
+    
+- $\boxed{Freq_{new} = Freq \cdot \Phi_i}$
+- $\boxed{E_{new} = E \cdot \alpha_i}$
+- $\boxed{\mu_{new} = ln(E_new) - \frac{\sigma^2}{2}}$
+- where $i = \overline{1,5}$ - type of the psychotype 
+
+There's the final table of coefficients for each type: (ADD)
+#### 2.2.2 Daily & weekly routine
+Let's define weights for a day and for a week. We need to do this because of peoples' different behaviour depending on the time of a day and the day of a week. For example, there will be more chance to have a spike of transactions in __'$Entertainment$'__ on Saturday than on Tuesday because most people work in the period between Monday and Friday what is called '5/2'.
+
+We'll begin with a daily routine:
+
+1) __00:00-06:00 - Sleep zone__. There will be the lowest amount of transactions (maybe some automatic subscriptions) because most people are asleep. The weight for this time will be equal to __0.1__.
+2) __06:00-11:00 - Morning rush__. At that time people will be having breakfasts and their morning coffees, rushing to their jobs so the weight will be __0.7__.
+3) __11:00-15:00 - Lunch time__. Active time for dining and small restaurant purchases. People often use this time for a break from work. The weight will be equal to __0.8__.
+4) __15:00-18:00 - Afternoon lull__. Work focus increases, and transaction intensity drops slightly. The weight is __0.4__.
+5) __18:00-22:00 - Evening peak__. The most active period when people buy groceries for dinner (__'$Food$'__), go to __'$Restaraunts$ & $cafe$'__, or enjoy __'$Entertainment$'__. The weight is __1.0__.
+6) __22:00-00:00 - Late evening__. Transactions fade out as people prepare for sleep. Mostly online orders or late-night taxi rides. The weight is __0.2__.  
+
+Now let's focus on a weekly routine:
+
+1) __Monday-Thursday__. They are 'Working days' so here we can see a stable intensity with a focus on __'$Transport$'__ and __'$Food$'__.
+2) __Friday__. Evening spike in __'$Restaurants$ & $cafe$'__ and __'$Entertainment$'__ categories.
+3) __Saturday__. The absolute peak of the week. High intensity in __'$Clothing$ $and$ $shoes$'__, __'$Entertainment$'__, and large __'$Food$'__ purchases.
+4) __Sunday__. Activity decreases toward the evening as people prepare for the new work week.
+
+That's all information in this section that is needed for a future modeling.
+#### 2.2.3 Monthly cycles
+We can set two major inflow days: __the 10th__ and __25th__ of each month. During the 3 days following these dates, the transaction frequency coefficient $\Phi$ and the amount coefficient $\alpha$ will __increase by 20-30%__. For The Party King psychotype, this effect is maximized, leading to a 'spending spree' followed by a period of 'silence' when funds are exhausted. Also we should note that if the 10th is __Saturday__ then we'll use __the 9th__ of this month.
+
+Certain categories don't follow a probability distribution but occur as fixed events:
+- Housing and communal services (HCS): Typically one large transaction between __the 15th and 20th__ of the month.
+- Communication services: A fixed payment for mobile and internet usually occurs on __the 1st day__ of the month or a __specific__ billing date.
+
+### 2.3. Cross-Category Dependencies
+In real life, transactions are rarely isolated events. They often form 'chains' or show inverse correlations. To make our generator indistinguishable from real banking data, we incorporate the following dependencies:
+1) __Complementary dependencies__:
+    - __Entertainment → Transport__: A high transaction in the __'$Entertainment$'__ category late in the evening (after 22:00) triggers a subsequent __'$Transport$'__ (taxi) transaction with a probability of __$\approx$0.8__.
+    - __Auto → Other__: Maintenance in the __'$Auto$'__ category often correlates with __'$Other$'__ transactions (e.g., buying accessories or paying for parking).
+2) __Substitution effect__:
+    - __Food vs Restaurants & cafe__: These categories have an inverse relationship on a daily scale. If a user has a high-amount transaction in __'$Restaurants$ & $cafe$'__ (a family dinner), the probability of a __'$Food$'__ (grocery store) transaction on the same evening drops by __$\approx$60%__.
+3) __Psychotype-Specific Chains__:
+    - __The Unstoppable Player__: A successful "win" (modeled as a high __'$Other$'__ or __'$Entertainment$'__ transaction) triggers an immediate spree in __'$Restaurants$ & $cafe$'__ to celebrate.
+    - __The hypochondriac Survivalist__: Large transactions in __'$Health$'__ (pharmacy/clinic) increase the probability of staying home, reducing __'$Transport$'__ and __'$Entertainment$'__ frequency to __near zero__ for the next 48 hours.
 
 ### 2.4. Fraud detection
-This topic is the most important for generating like a real data.  
-
-### 2.5. Literature & Sources
+To evaluate the effectiveness of anti-fraud systems, our generator must simulate not only legitimate behavior but also common fraudulent patterns. We will implement three main types of anomalies:
+1) __Velocity attacks__:
+    - __Logic__: A sudden burst of transactions in a very short period
+    - __Simulation__: 10+ transactions within 60 seconds in categories like __'$Communications$'__ or __'$Other$'__ (e.g., small transfers or mobile top-ups to "clean" the card balance). Also we'll use __Poisson distribution__ with a very high value of $\lambda$ to simulate this scenario properly. In peaks $\lambda$ will be increased up to __50-100 times__.
+2) __Account takeover | Behavioral Shift__:
+    - __Logic__: Somehow client's card or account was stolen. For example, conservative __'Goblin Treasurer'__ suddenly starts spending like an __'Unstoppable Player'__.
+    - __Simulation__: A sharp increase in $E$ and $\Phi$ coefficients for high-risk categories (__'$Entertainment$'__, __'$Other$'__) during unusual hours (e.g., the __'Sleep zone'__ 03:00 AM).
+3) __Unusual location or merchants__:
+    - __Logic__: Transactions from merchants that the user has never visited or that don't match their profile.
+    - __Simulation__: Although our current dataset focus is on names, we will flag transactions as fraud if the __'Merchant_name'__ belongs to a __'high-risk' list__ that doesn't correlate with the Category or the user's typical daily route.
